@@ -1,0 +1,66 @@
+#!/bin/bash
+#Java builder WAR
+
+#megam_play_builder/build remote_repo="https://github.com/thomasalrin/megam_play.git"
+
+
+for i in "$@"
+do
+case $i in
+    remote_repo=*)
+    remote_repo="${i#*=}"
+    ;;
+esac
+done
+
+filename=$(basename "$remote_repo")
+extension="${filename##*.}"
+
+filename=${filename%%.*}
+
+megam_user_home="/home/megam/"
+local_repo="/usr/share/"
+
+#clone source from git repo
+#Add path for bin sbt
+#Refresh bashrc
+#download sbt-launcher
+#write bin script for sbt
+#Stage play project
+#Copy zip to /usr/local/share
+#Unzip dist content
+#change start script as executable
+
+case "$extension" in
+
+git)  cd $local_repo
+      [ -f *war ] &&  rm -f *.war
+      cd $megam_user_home
+      [ -d $filename ] &&  rm -rf $filename
+      git clone $remote_repo
+      echo "PATH=$PATH:$megam_user_home/bin" >> $megam_user_home/.bashrc
+      source .bashrc
+      wget -O $megam_user_home/bin/sbt-launch.jar http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.0/sbt-launch.jar
+      echo "java -server -Xms256M -Xmx512M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" >> $megam_user_home/bin/sbt
+      chmod 755 /home/megam/bin/sbt*
+      cd $megam_user_home/$filename
+      sbt clean compile stage dist
+      cp $megam_user_home/$filename/target/universal/*.zip $megam_user_home/$filename/target
+
+      unzip $megam_user_home/$filename/target/*.zip -d $megam_user_home/$filename/target
+
+      [ -f $megam_user_home/$filename/target/*.zip ] &&  rm -f $megam_user_home/$filename/target/*.zip
+      mv $megam_user_home/$filename/target/$filename* $megam_user_home/$filename/target/$filename
+      mv $megam_user_home/$filename/target/$filename $local_repo
+      find $local_repo/$filename/ -type f -name $filename -exec chmod 755 {} \;
+      ;;
+
+deb)  wget -O $megam_user_home/play.deb $remote_repo
+      dpkg -i $megam_user_home/play.deb
+      ;;
+
+esac
+
+
+
+
