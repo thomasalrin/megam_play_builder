@@ -37,10 +37,10 @@ git)  cd $local_repo
       [ -f *war ] &&  rm -f *.war
       cd $megam_user_home
       [ -d $filename ] &&  rm -rf $filename
-      git clone $remote_repo
-      echo "PATH=$PATH:$megam_user_home/bin" >> $megam_user_home/.bashrc
+      git clone $remote_repo -b 0.8
+      echo "PATH=$PATH:$megam_user_home/bin" >> /root/.bashrc
       source .bashrc
-      wget -O $megam_user_home/bin/sbt-launch.jar http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.0/sbt-launch.jar
+      wget -O $megam_user_home/bin/sbt-launch.jar http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar
       echo "java -server -Xms256M -Xmx512M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" >> $megam_user_home/bin/sbt
       chmod 755 /home/megam/bin/sbt*
       cd $megam_user_home/$filename
