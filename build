@@ -37,20 +37,20 @@ git)  cd $local_repo
       [ -f *war ] &&  rm -f *.war
       cd $megam_user_home
       [ -d $filename ] &&  rm -rf $filename
-      git clone $remote_repo -b 0.8
+      git clone $remote_repo
       echo "PATH=$PATH:$megam_user_home/bin" >> /root/.bashrc
-      source .bashrc
+      source /root/.bashrc
       wget -O $megam_user_home/bin/sbt-launch.jar http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar
       echo "java -server -Xms256M -Xmx512M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" >> $megam_user_home/bin/sbt
       chmod 755 /home/megam/bin/sbt*
       cd $megam_user_home/$filename
       sbt clean compile stage dist
-      cp $megam_user_home/$filename/target/universal/*.zip $megam_user_home/$filename/target
-
-      unzip $megam_user_home/$filename/target/*.zip -d $megam_user_home/$filename/target
+      cp $megam_user_home/$filename/target/universal/*.zip $megam_user_home/$filename/target/
+      unzip $megam_user_home/$filename/target/*.zip -d $megam_user_home/$filename/target/play-zip
 
       [ -f $megam_user_home/$filename/target/*.zip ] &&  rm -f $megam_user_home/$filename/target/*.zip
-      mv $megam_user_home/$filename/target/$filename* $megam_user_home/$filename/target/$filename
+
+      mv `echo target/play-zip/*` $megam_user_home/$filename/target/$filename
       mv $megam_user_home/$filename/target/$filename $local_repo
       find $local_repo/$filename/ -type f -name $filename -exec chmod 755 {} \;
       ;;
