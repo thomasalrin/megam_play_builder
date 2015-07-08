@@ -13,6 +13,8 @@ case $i in
 esac
 done
 
+PLAY_LOG="/var/log/megam/play_build.log"
+
 filename=$(basename "$remote_repo")
 extension="${filename##*.}"
 
@@ -37,7 +39,7 @@ git)  cd $local_repo
       [ -f *war ] &&  rm -f *.war
       cd $megam_user_home
       [ -d $filename ] &&  rm -rf $filename
-      git clone $remote_repo
+      git clone $remote_repo >> $PLAY_LOG
 ################################# megam-trusty image in one is built with sbt #################################
      # echo "PATH=$PATH:$megam_user_home/bin" >> /root/.bashrc
      # wget -O $megam_user_home/bin/sbt-launch.jar http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar
@@ -48,7 +50,9 @@ git)  cd $local_repo
       #source /root/.bashrc
 ###############################################################################################################
       cd $megam_user_home/$filename
-      sbt clean compile stage dist
+	echo "sbt clean compile stage dist started====> " >> $PLAY_LOG
+      sbt clean compile stage dist  >> $PLAY_LOG
+	echo "sbt clean compile stage dist Ended====> " >> $PLAY_LOG
       mv $megam_user_home/$filename/target/universal/*.zip $megam_user_home/$filename/target/
 #cp /home/megam/megam_gateway/target/universal/*.zip /home/megam/megam_gateway/target/
       unzip $megam_user_home/$filename/target/*.zip -d $megam_user_home/$filename/target/play-zip
