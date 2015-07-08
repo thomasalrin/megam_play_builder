@@ -1,7 +1,7 @@
 #!/bin/bash
 #Java builder WAR
 
-#megam_play_builder/build remote_repo="https://github.com/thomasalrin/megam_play.git"
+#megam_play_builder/build remote_repo="https://github.com/thomasalrin/megam_gateway.git"
 
 
 for i in "$@"
@@ -38,19 +38,26 @@ git)  cd $local_repo
       cd $megam_user_home
       [ -d $filename ] &&  rm -rf $filename
       git clone $remote_repo
-      echo "PATH=$PATH:$megam_user_home/bin" >> /root/.bashrc
-      source /root/.bashrc
-      wget -O $megam_user_home/bin/sbt-launch.jar http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar
-      echo "java -server -Xms256M -Xmx512M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" >> $megam_user_home/bin/sbt
-      chmod 755 /home/megam/bin/sbt*
+################################# megam-trusty image in one is built with sbt #################################
+     # echo "PATH=$PATH:$megam_user_home/bin" >> /root/.bashrc
+     # wget -O $megam_user_home/bin/sbt-launch.jar http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar
+     # echo "java -server -Xms256M -Xmx512M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" >> $megam_user_home/bin/sbt
+     # chmod 755 /home/megam/bin/sbt*
+
+	#exec bash | true
+      #source /root/.bashrc
+###############################################################################################################
       cd $megam_user_home/$filename
       sbt clean compile stage dist
-      cp $megam_user_home/$filename/target/universal/*.zip $megam_user_home/$filename/target/
+      mv $megam_user_home/$filename/target/universal/*.zip $megam_user_home/$filename/target/
+#cp /home/megam/megam_gateway/target/universal/*.zip /home/megam/megam_gateway/target/
       unzip $megam_user_home/$filename/target/*.zip -d $megam_user_home/$filename/target/play-zip
+#unzip /home/megam/megam_gateway/target/*.zip -d /home/megam/megam_gateway/target/play-zip
 
       [ -f $megam_user_home/$filename/target/*.zip ] &&  rm -f $megam_user_home/$filename/target/*.zip
 
       mv `echo target/play-zip/*` $megam_user_home/$filename/target/$filename
+# mv `echo target/play-zip/*` /home/megam/megam_gateway/target/megam_gateway
       mv $megam_user_home/$filename/target/$filename $local_repo
       find $local_repo/$filename/ -type f -name $filename -exec chmod 755 {} \;
       ;;
